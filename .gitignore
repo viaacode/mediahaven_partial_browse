@@ -1,0 +1,8 @@
+config.yml
+*log
+.spyproject/
+__pycache__
+build/
+*egg-info/
+dist/
+*.mp4
