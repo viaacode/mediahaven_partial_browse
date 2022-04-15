@@ -234,9 +234,15 @@ class MhRequest(object):
 def get_fragment_id(pid):
     """Returns the fragmentId if given pid"""
     o = MhRequest(query='%2B(PID:{})'.format(pid))()
-    fragment_id=o['Results'][0]['Internal']['FragmentId']
-    return fragment_id
-
+    if o['NrOfResults'] >= 2:
+        for i in o['Results']:
+            if i['Internal']['BrowseStatus'] != "no_browse":
+                return i['Internal']['FragmentId']
+    else:
+        #print(o)
+        fragment_id=o['Results'][0]['Internal']['FragmentId']
+        return fragment_id
+#print(get_fragment_id('6w96715g4g'))
 @retry((ValueError, TypeError, AttributeError), tries=20, delay=1, backoff=2,
        max_delay=4)
 def dwnl(url, file):
@@ -319,11 +325,12 @@ def get_partial(pid=None,filename=None,
     fragId = get_fragment_id(pid=pid)
     if filename is None:
         filename = pid+'-patrtial'+'.mp4'
+    efilename = filename.replace('/','_')
     query = queryTemplate.substitute(pid=pid,
                                      fragId=fragId,
                                      start_frames=start_frames,
                                      end_frames=end_frames,
-                                     filename=filename)
+                                     filename=efilename)
     global token
     s = requests.Session()
     retries = Retry(total=5,
@@ -344,12 +351,16 @@ def get_partial(pid=None,filename=None,
                   headers=header,
                   proxies=proxyDict,
                   data=query)
+    print(str(r.json()))
     exportid =  r.json()[0]['ExportJobId']
     logger.info('checking id: '+ exportid)
     url=export_poll_status(exportid)
     dwnl(url, filename)
     return r.json()
 
+
+
+
+
 if __name__ == '__main__':
     main()
-
