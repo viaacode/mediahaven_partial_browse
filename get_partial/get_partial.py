@@ -235,14 +235,17 @@ def get_fragment_id(pid):
     """Returns the fragmentId if given pid"""
     o = MhRequest(query='%2B(PID:{})'.format(pid))()
     if o['NrOfResults'] >= 2:
+        logger.info('Found more than one item')
         for i in o['Results']:
-            if i['Internal']['BrowseStatus'] != "no_browse":
+            print(i)
+            if i['Internal']['BrowseStatus'] != "no_browse" and \
+                i['Internal']['Browses']['Browse'][0]['Container'] == 'mp4':
                 return i['Internal']['FragmentId']
     else:
         #print(o)
         fragment_id=o['Results'][0]['Internal']['FragmentId']
         return fragment_id
-#print(get_fragment_id('6w96715g4g'))
+#print(get_fragment_id('ft8df9fv0q'))
 @retry((ValueError, TypeError, AttributeError), tries=20, delay=1, backoff=2,
        max_delay=4)
 def dwnl(url, file):
@@ -362,5 +365,5 @@ def get_partial(pid=None,filename=None,
 
 
 
-if __name__ == '__main__':
-    main()
+# if __name__ == '__main__':
+#     main()
