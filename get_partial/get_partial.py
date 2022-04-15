@@ -324,8 +324,8 @@ def get_partial(pid=None,filename=None,
     """
     fragId = get_fragment_id(pid=pid)
     if filename is None:
-        filename = pid+'-patrtial'+'.mp4'
-    efilename = filename.replace('/','_')
+        filename = pid+'_patrtial'+'.mp4'
+    efilename = pid+'_patrtial'+'.mp4'
     query = queryTemplate.substitute(pid=pid,
                                      fragId=fragId,
                                      start_frames=start_frames,
